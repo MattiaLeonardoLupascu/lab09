@@ -1,22 +1,25 @@
 package it.unibo.mvc;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Random;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 /**
  * This class is a simple application that writes a random number on a file.
@@ -32,6 +35,7 @@ public class BadIOGUI {
     private static final String PATH = System.getProperty("user.home")
         + File.separator
         + BadIOGUI.class.getSimpleName() + ".txt";
+    private static final Path path = Path.of(PATH);
     private static final int PROPORTION = 5;
     private final Random randomGenerator = new Random();
     private final JFrame frame = new JFrame(TITLE);
@@ -42,8 +46,17 @@ public class BadIOGUI {
     public BadIOGUI() {
         final JPanel canvas = new JPanel();
         canvas.setLayout(new BorderLayout());
+        /*EX 01.01 */
+        final JPanel aJPanel = new JPanel();
+        aJPanel.setLayout(new BoxLayout(aJPanel, BoxLayout.X_AXIS));
+        canvas.add(aJPanel,BorderLayout.CENTER);
         final JButton write = new JButton("Write on file");
-        canvas.add(write, BorderLayout.CENTER);
+        aJPanel.add(write);
+        /*END */
+        /*EX 01.02 */
+        final JButton read = new JButton("Read on file");
+        aJPanel.add(read);
+        /*END */
         frame.setContentPane(canvas);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         /*
@@ -69,6 +82,24 @@ public class BadIOGUI {
                 }
             }
         );
+        read.addActionListener(
+            new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent ignored){
+                    try (BufferedReader bf = new BufferedReader(new FileReader(PATH))) {
+                        List<String> linesRead = bf.readAllLines();
+                        for (String text : linesRead) {
+                            System.out.println(text);
+                        }
+                    } catch (final IOException e) {
+                        JOptionPane.showMessageDialog(frame, e, "Error", JOptionPane.ERROR_MESSAGE);
+                        e.printStackTrace(); // NOPMD: allowed as this is just an exercise
+                    } finally {
+                        System.out.println("The button [Read on file] has been pressed.");
+                    }
+                }
+            }
+        );
     }
 
     private void display() {
@@ -90,6 +121,8 @@ public class BadIOGUI {
          * on screen. Results may vary, but it is generally the best choice.
          */
         frame.setLocationByPlatform(true);
+        /*resize the frame to the minimum size prior to displaying */
+        frame.pack();
         /*
          * OK, ready to push the frame onscreen
          */
