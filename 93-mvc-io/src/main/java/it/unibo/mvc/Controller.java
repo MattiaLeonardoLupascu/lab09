@@ -5,5 +5,9 @@ package it.unibo.mvc;
  * responsible for managing the flow of data between the model and the view.
  */
 public interface Controller {
+/*
+Writes on standard output
+*/
+void printOnStandardOutput();
 
 }
